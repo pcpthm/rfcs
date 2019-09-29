@@ -1,0 +1,68 @@
+- Feature Name: `version-aware-inference`
+- Start Date: 2019-09-29
+- RFC PR: [rust-lang/rfcs#0000](https://github.com/rust-lang/rfcs/pull/0000)
+- Rust Issue: [rust-lang/rust#0000](https://github.com/rust-lang/rust/issues/0000)
+
+# Summary
+[summary]: #summary
+
+End insta-stable trait `impl`s and reduce stable-to-stable regressions.
+
+# Motivation
+[motivation]: #motivation
+
+Today, `#[stable(…)]` or `#[unstable(…)]` attribute on `impl`s of a trait is no-op and all trait `impl`s are "insta-stable".
+However, it often causes type inference regressions *please fill some examples*. Such regressions are not desirable for the Rust compiler as a backward compatibility guaranteed software but in practice, those regressions are treated as acceptable because there was no way to solve this problem.
+
+Here, I propose a way to solve the long-standing issue above in a generic manner, without affecting the semantics of the language.
+
+# Guide-level explanation
+[guide-level-explanation]: #guide-level-explanation
+
+When type inference cannot determine due to ambiguity, the compiler tries to solve type without using unstable or newer `impl`s.
+
+```rust
+//! On std
+#[stable(feature = "rust1", since = "1.0.0")]
+impl From<&str> for String { ... }
+
+// new impl added in 1.35.0
+#[stable(feature = "from_ref_string", since = "1.35.0")]
+impl From<&String> for String { ... }
+
+
+//! User code written before 1.35.0
+fn use_string(string: impl Into<String>) { ... }
+
+fn pass_string(string: String) {
+    use_string(string.as_ref());
+    // ^ Previously: error[E0283]: type annotations required: cannot resolve `std::string::String: std::convert::AsRef<_>`
+    // ^ Now: Continue to working as expected.
+}
+```
+
+# Reference-level explanation
+[reference-level-explanation]: #reference-level-explanation
+
+Consider *cost* of each trait `impl` as stabilization version or 0 if no stabilization attribute present.
+Then define *cost* of a solution (of a trait resolution) as the maximum of the costs of the used `impl`s.
+We want to find a solution with minimal cost solution. If there are multiple solutions with the same minimum cost, then it is an error.
+
+This is backward compatible because if there is only one solution then it is the minimum cost one anyway.
+
+NOT SURE ABOUT THIS: Trait solving is something like a BFS on a graph and a path is a solution. Multiple paths == ambiguous. It should be able to extend this BFS to find the [minimax path](https://en.wikipedia.org/wiki/Widest_path_problem) using Dijkstra's algorithm on max-min semiring.
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+# Rationale and alternatives
+[rationale-and-alternatives]: #rationale-and-alternatives
+
+# Prior art
+[prior-art]: #prior-art
+
+# Unresolved questions
+[unresolved-questions]: #unresolved-questions
+
+# Future possibilities
+[future-possibilities]: #future-possibilities
