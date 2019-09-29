@@ -109,3 +109,5 @@ Stable and unstable are still distinct and nightly features can be introduced wi
 
 # Future possibilities
 [future-possibilities]: #future-possibilities
+
+- Generalize stability attributes to user crates. Probably its "version" should specify a crate version, not rustc version.
