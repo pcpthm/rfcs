@@ -44,8 +44,30 @@ fn pass_string(string: String) {
 # Reference-level explanation
 [reference-level-explanation]: #reference-level-explanation
 
-Consider *cost* of each trait `impl` as stabilization version or 0 if no stabilization attribute present.
-Then define *cost* of a solution (of a trait resolution) as the maximum of the costs of the used `impl`s.
+## The cost
+
+- Let *cost* of each trait `impl` as stabilization version.
+  - If `stable` or `unstable` attribute with `since` argument is present, the cost is the value of `since` argument.
+  - If `unstable` attribute is present but no `since` version is specified, the cost is infinity.
+  - If `stable` nor `unstable` attribute is present, the cost is 0.
+- Then define *cost* of a solution (of a trait resolution) as the maximum of the costs of the used `impl`s.
+
+The cost is represented as a following enum:
+
+```rust
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
+enum Cost {
+    StableUnspecified,
+    Stable(Version),
+    Unstable(Version),
+    UnstableUnspecified,
+}
+```
+
+Note that the ordering is `derive`d.
+
+## Solve for the minimum cost
+
 We want to find a solution with minimal cost solution. If there are multiple solutions with the same minimum cost, then it is an error.
 
 This is backward compatible because if there is only one solution then it is the minimum cost one anyway.
