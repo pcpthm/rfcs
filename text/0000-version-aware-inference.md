@@ -6,7 +6,7 @@
 # Summary
 [summary]: #summary
 
-End insta-stable trait `impl`s and reduce stable-to-stable regressions.
+End insta-stable trait `impl`s and reduce stable-to-stable regressions by choosing longest-stable trait `impl` when otherwise ambiguous.
 
 # Motivation
 [motivation]: #motivation
