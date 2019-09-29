@@ -97,6 +97,35 @@ Stable and unstable are still distinct and nightly features can be introduced wi
 
 Efficient implementation: first solve on `squash`ed costs. If the solution is not unique, then solve original costs. This procedure calls solver only once when no warnings are emitted.
 
+## Stability attributes on methods
+
+```rust
+trait TraitA {
+    #[stable(since = "1")]
+    fn provided_method(&self) {}
+}
+
+trait TraitB {
+    #[stable(since = "2")]
+    fn provided_method(&self) {}
+}
+
+#[stable(since = "1")]
+impl TraitA for () {}
+
+#[stable(since = "1")]
+impl TraitB for () {}
+
+fn f() {
+    // should resolve to TraitA
+    ().provided_method();
+}
+```
+
+*I think* it can be implemented in the same way as trait `impl`s, such that `cost` is associated with the particular method lookup. Also, apply to non-trait methods? Useful when a conflict between trait method vs. inherit method etc. but it is unlikely to occur in `std` anyway. It is still better if more general is simpler.
+
+*TODO: when I convinced there is no problem, replace phrases "`impl`s" to a more general term.*
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
