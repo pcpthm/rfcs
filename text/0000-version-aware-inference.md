@@ -95,6 +95,8 @@ If a unique solution can be determined with complete stabilization version aware
 
 Stable and unstable are still distinct and nightly features can be introduced without warnings.
 
+Efficient implementation: first solve on `squash`ed costs. If the solution is not unique, then solve original costs. This procedure calls solver only once when no warnings are emitted.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
