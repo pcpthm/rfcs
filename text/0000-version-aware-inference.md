@@ -74,6 +74,27 @@ This is backward compatible because if there is only one solution then it is the
 
 NOT SURE ABOUT THIS: Trait solving is something like a BFS on a graph and a path is a solution. Multiple paths == ambiguous. It should be able to extend this BFS to find the [minimax path](https://en.wikipedia.org/wiki/Widest_path_problem) using Dijkstra's algorithm on max-min semiring.
 
+## Linting
+
+*TODO: Write motivation for this lint.*
+
+Given the following function:
+
+```rust
+fn squash(cost: Cost) -> Cost {
+    match cost {
+        StableUnspecified => StableUnspecified,
+        Stable(_) => StableUnspecified,
+        Unstable(_) => UnstableUnspecified,
+        UnstableUnspecified => UnstableUnspecified,
+    }
+}
+```
+
+If a unique solution can be determined with complete stabilization version awareness but it is no longer unique when `squash` is applied to the costs, a warning is emitted.
+
+Stable and unstable are still distinct and nightly features can be introduced without warnings.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
